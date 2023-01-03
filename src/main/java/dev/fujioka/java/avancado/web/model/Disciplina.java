@@ -4,9 +4,7 @@ package dev.fujioka.java.avancado.web.model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
@@ -18,9 +16,17 @@ public class Disciplina {
     @GeneratedValue
     private Integer id;
 
-    private String curso;
+    private String nome;
+
+    @Column(name = "carga_horaria")
+    private String cargaHoraria;
 
     private String professor;
+
+    @Enumerated(EnumType.STRING)
+    private StatusDisciplina statusDisciplina;
+
+    private String observacao;
 
 
 }

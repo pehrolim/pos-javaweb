@@ -1,12 +1,12 @@
 package dev.fujioka.java.avancado.web.service;
 
+import dev.fujioka.java.avancado.web.exception.EntidadeNaoEncontradaException;
 import dev.fujioka.java.avancado.web.model.Aluno;
 import dev.fujioka.java.avancado.web.repository.AlunoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class AlunoService {
@@ -23,23 +23,33 @@ public class AlunoService {
     }
 
     public Aluno consultarPorId(int id){
-        return alunoRepository.findById(id).orElseThrow();
+        return alunoRepository.findById(id).orElseThrow(() -> new  EntidadeNaoEncontradaException(String.format("Não existe aluno com o id: %d", id)));
     }
 
     public void excluir(int id){
-        alunoRepository.deleteById(id);
+
+        try {
+            this.consultarPorId(id);
+            alunoRepository.deleteById(id);
+        }catch (EntidadeNaoEncontradaException e){
+            throw new  EntidadeNaoEncontradaException(String.format("Não existe aluno com o id: %d", id));
+        }
     }
 
-    public Aluno alterar(Aluno aluno){
-        if(Objects.isNull(aluno.getId())){
-            throw new RuntimeException("ID não preenchido");
-        }
-        return alunoRepository.save(aluno);
+    public Aluno alterar(Integer id, Aluno novoAluno){
+        Aluno aluno = consultarPorId(id);
+        this.atualizaAluno(aluno, novoAluno);
+        return this.salvar(aluno);
     }
 
     public List<Aluno> buscarAlunoLike(String nome){
         return alunoRepository.buscarAlunoPorNomeLike(nome);
     }
 
+    private void atualizaAluno(Aluno aluno, Aluno novoAluno){
+        aluno.setNome(novoAluno.getNome());
+        aluno.setMatricula(novoAluno.getMatricula());
+        aluno.setCurso(novoAluno.getCurso());
+    }
 
 }

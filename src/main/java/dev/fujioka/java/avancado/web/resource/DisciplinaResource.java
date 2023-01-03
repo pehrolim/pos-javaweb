@@ -2,21 +2,24 @@ package dev.fujioka.java.avancado.web.resource;
 
 
 
+import dev.fujioka.java.avancado.web.exception.EntidadeNaoEncontradaException;
 import dev.fujioka.java.avancado.web.model.Disciplina;
 import dev.fujioka.java.avancado.web.service.DisciplinaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/disciplina")
+@RequestMapping("/disciplinas")
 public class DisciplinaResource {
 
     @Autowired
     DisciplinaService disciplinaService;
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public ResponseEntity<Disciplina> salvar(@RequestBody Disciplina disciplina){
         return ResponseEntity.ok(disciplinaService.salvar(disciplina));
@@ -29,18 +32,31 @@ public class DisciplinaResource {
 
     @GetMapping("/{id}")
     public ResponseEntity<Disciplina> consultaPorId(@PathVariable int id){
-        return ResponseEntity.ok(disciplinaService.consultarPorId(id));
+        try {
+            return ResponseEntity.ok(disciplinaService.consultarPorId(id));
+        }catch (EntidadeNaoEncontradaException e){
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Disciplina> deletePorId(@PathVariable int id){
-        disciplinaService.excluir(id);
-        return ResponseEntity.ok().build();
+        try {
+            disciplinaService.excluir(id);
+            return ResponseEntity.ok().build();
+        }catch (EntidadeNaoEncontradaException e){
+            return ResponseEntity.notFound().build();
+        }
+
     }
 
-    @PutMapping
-    public ResponseEntity<Disciplina> alterar(@RequestBody Disciplina disciplina){
-        return ResponseEntity.ok(disciplinaService.alterar(disciplina));
+    @PutMapping("/{id}")
+    public ResponseEntity<Disciplina> alterar(@PathVariable Integer id,@RequestBody Disciplina disciplina){
+        try {
+            return ResponseEntity.ok(disciplinaService.alterar(id, disciplina));
+        }catch (EntidadeNaoEncontradaException e){
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }

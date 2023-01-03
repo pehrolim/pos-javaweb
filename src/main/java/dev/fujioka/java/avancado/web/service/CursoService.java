@@ -1,13 +1,13 @@
 package dev.fujioka.java.avancado.web.service;
 
 
+import dev.fujioka.java.avancado.web.exception.EntidadeNaoEncontradaException;
 import dev.fujioka.java.avancado.web.model.Curso;
 import dev.fujioka.java.avancado.web.repository.CursoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class CursoService {
@@ -24,18 +24,30 @@ public class CursoService {
     }
 
     public Curso consultarPorId(int id){
-        return cursoRepository.findById(id).orElseThrow();
+
+        return cursoRepository.findById(id).orElseThrow(() -> new EntidadeNaoEncontradaException(String.format("Não existe curso com o id: %d", id)));
+
     }
 
     public void excluir(int id){
-        cursoRepository.deleteById(id);
+        try {
+            this.consultarPorId(id);
+            cursoRepository.deleteById(id);
+        }catch (EntidadeNaoEncontradaException e){
+            throw new  EntidadeNaoEncontradaException(String.format("Não existe curso com o id: %d", id));
+        }
+
     }
 
-    public Curso alterar(Curso curso){
-        if(Objects.isNull(curso.getId())){
-            throw new RuntimeException("ID não preenchido");
-        }
-        return cursoRepository.save(curso);
+    public Curso alterar(Integer id, Curso novoCurso){
+        Curso curso = consultarPorId(id);
+        this.atualizaCurso(curso, novoCurso);
+        return this.salvar(curso);
+    }
+
+    private void atualizaCurso(Curso curso, Curso novoCurso) {
+        curso.setNome(novoCurso.getNome());
+        curso.setDescricao(novoCurso.getDescricao());
     }
 
 }
