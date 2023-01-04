@@ -5,6 +5,7 @@ import dev.fujioka.java.avancado.web.model.Disciplina;
 import dev.fujioka.java.avancado.web.repository.DisciplinaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ public class DisciplinaService {
     @Autowired
     DisciplinaRepository disciplinaRepository;
 
+    @Transactional
     public Disciplina salvar(Disciplina disciplina){
         return disciplinaRepository.save(disciplina);
     }
@@ -26,19 +28,21 @@ public class DisciplinaService {
         return disciplinaRepository.findById(id).orElseThrow(() -> new EntidadeNaoEncontradaException(String.format("Não existe disciplina com o id: %d", id)));
     }
 
+    @Transactional
     public void excluir(int id){
 
         try {
-            consultarPorId(id);
+            this.consultarPorId(id);
             disciplinaRepository.deleteById(id);
         }catch (EntidadeNaoEncontradaException e){
             throw new  EntidadeNaoEncontradaException(String.format("Não existe disciplina com o id: %d", id));
         }
     }
 
+    @Transactional
     public Disciplina alterar(Integer id, Disciplina novaDisciplina){
         Disciplina disciplina = consultarPorId(id);
-        atualizaDisciplina(disciplina, novaDisciplina);
+        this.atualizaDisciplina(disciplina, novaDisciplina);
         return this.salvar(disciplina);
     }
 

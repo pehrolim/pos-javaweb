@@ -6,6 +6,7 @@ import dev.fujioka.java.avancado.web.model.Professor;
 import dev.fujioka.java.avancado.web.repository.ProfessorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -16,6 +17,7 @@ public class ProfessorService {
     @Autowired
     ProfessorRepository professorRepository;
 
+    @Transactional
     public Professor salvar(Professor professor){
         return professorRepository.save(professor);
     }
@@ -28,19 +30,21 @@ public class ProfessorService {
         return professorRepository.findById(id).orElseThrow(() -> new EntidadeNaoEncontradaException(String.format("Não existe professor com o id: %d", id)));
     }
 
+    @Transactional
     public void excluir(int id){
 
         try {
-            consultarPorId(id);
+            this.consultarPorId(id);
             professorRepository.deleteById(id);
         }catch (EntidadeNaoEncontradaException e){
             throw new  EntidadeNaoEncontradaException(String.format("Não existe professor com o id: %d", id));
         }
     }
 
+    @Transactional
     public Professor alterar(Integer id, Professor novoProfessor){
         Professor professor = consultarPorId(id);
-        atualizaProfessor(professor, novoProfessor);
+        this.atualizaProfessor(professor, novoProfessor);
         return this.salvar(professor);
     }
 

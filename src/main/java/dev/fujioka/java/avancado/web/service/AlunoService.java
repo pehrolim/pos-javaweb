@@ -5,6 +5,7 @@ import dev.fujioka.java.avancado.web.model.Aluno;
 import dev.fujioka.java.avancado.web.repository.AlunoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,18 +15,22 @@ public class AlunoService {
     @Autowired
     private AlunoRepository alunoRepository;
 
+    @Transactional
     public Aluno salvar(Aluno aluno){
         return alunoRepository.save(aluno);
     }
+
 
     public List<Aluno> listarAlunos(){
         return alunoRepository.findAll();
     }
 
+
     public Aluno consultarPorId(int id){
         return alunoRepository.findById(id).orElseThrow(() -> new  EntidadeNaoEncontradaException(String.format("Não existe aluno com o id: %d", id)));
     }
 
+    @Transactional
     public void excluir(int id){
 
         try {
@@ -36,6 +41,7 @@ public class AlunoService {
         }
     }
 
+    @Transactional
     public Aluno alterar(Integer id, Aluno novoAluno){
         Aluno aluno = consultarPorId(id);
         this.atualizaAluno(aluno, novoAluno);

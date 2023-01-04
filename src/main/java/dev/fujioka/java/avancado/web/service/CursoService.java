@@ -6,6 +6,7 @@ import dev.fujioka.java.avancado.web.model.Curso;
 import dev.fujioka.java.avancado.web.repository.CursoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -15,6 +16,7 @@ public class CursoService {
     @Autowired
     CursoRepository cursoRepository;
 
+    @Transactional
     public Curso salvar(Curso curso){
         return cursoRepository.save(curso);
     }
@@ -29,6 +31,7 @@ public class CursoService {
 
     }
 
+    @Transactional
     public void excluir(int id){
         try {
             this.consultarPorId(id);
@@ -39,6 +42,7 @@ public class CursoService {
 
     }
 
+    @Transactional
     public Curso alterar(Integer id, Curso novoCurso){
         Curso curso = consultarPorId(id);
         this.atualizaCurso(curso, novoCurso);
