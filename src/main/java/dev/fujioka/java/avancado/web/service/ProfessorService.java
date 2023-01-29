@@ -1,10 +1,12 @@
 package dev.fujioka.java.avancado.web.service;
 
 
+import dev.fujioka.java.avancado.web.dto.ProfessorDTO;
 import dev.fujioka.java.avancado.web.exception.EntidadeNaoEncontradaException;
 import dev.fujioka.java.avancado.web.model.Professor;
 import dev.fujioka.java.avancado.web.repository.ProfessorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,9 +19,17 @@ public class ProfessorService {
     @Autowired
     ProfessorRepository professorRepository;
 
+    @Autowired
+    private JmsTemplate jmsTemplate;
+
     @Transactional
-    public Professor salvar(Professor professor){
-        return professorRepository.save(professor);
+    public ProfessorDTO salvar(Professor professor){
+        professor = professorRepository.save(professor);
+        jmsTemplate.convertAndSend("nome_professor_queue", professor);
+        return ProfessorDTO.builder()
+                .nome(professor.getNome())
+                .email(professor.getEmail())
+                .build();
     }
 
     public List<Professor> listarProfessores(){
@@ -42,7 +52,7 @@ public class ProfessorService {
     }
 
     @Transactional
-    public Professor alterar(Integer id, Professor novoProfessor){
+    public ProfessorDTO alterar(Integer id, Professor novoProfessor){
         Professor professor = consultarPorId(id);
         this.atualizaProfessor(professor, novoProfessor);
         return this.salvar(professor);

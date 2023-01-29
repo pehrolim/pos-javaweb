@@ -2,6 +2,7 @@ package dev.fujioka.java.avancado.web.resource;
 
 
 
+import dev.fujioka.java.avancado.web.dto.ProfessorDTO;
 import dev.fujioka.java.avancado.web.exception.EntidadeNaoEncontradaException;
 import dev.fujioka.java.avancado.web.model.Professor;
 import dev.fujioka.java.avancado.web.service.ProfessorService;
@@ -21,8 +22,8 @@ public class ProfessorResource {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public ResponseEntity<Professor> salvar(@RequestBody Professor professor){
-        return ResponseEntity.ok(professorService.salvar(professor));
+    public ProfessorDTO salvar(@RequestBody Professor professor){
+        return professorService.salvar(professor);
     }
 
     @GetMapping
@@ -52,7 +53,7 @@ public class ProfessorResource {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Professor> alterar(@PathVariable Integer id, @RequestBody Professor professor){
+    public ResponseEntity<ProfessorDTO> alterar(@PathVariable Integer id, @RequestBody Professor professor){
         try {
             return ResponseEntity.ok(professorService.alterar(id, professor));
         }catch (EntidadeNaoEncontradaException e){

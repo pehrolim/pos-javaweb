@@ -5,11 +5,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Entity
-public class Disciplina {
+public class Disciplina implements Serializable {
 
     @EqualsAndHashCode.Include
     @Id
@@ -23,7 +24,7 @@ public class Disciplina {
 
     private String professor;
 
-    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
     private StatusDisciplina statusDisciplina;
 
     private String observacao;

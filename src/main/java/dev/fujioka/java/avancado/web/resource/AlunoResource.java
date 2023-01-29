@@ -1,11 +1,13 @@
 package dev.fujioka.java.avancado.web.resource;
 
+import dev.fujioka.java.avancado.web.dto.AlunoDTO;
 import dev.fujioka.java.avancado.web.exception.EntidadeNaoEncontradaException;
 import dev.fujioka.java.avancado.web.model.Aluno;
 import dev.fujioka.java.avancado.web.repository.AlunoRepository;
 import dev.fujioka.java.avancado.web.service.AlunoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,8 +21,8 @@ public class AlunoResource {
     private AlunoService alunoService;
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping
-    public ResponseEntity<Aluno> salvar(@RequestBody Aluno aluno){
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<AlunoDTO> salvar(@RequestBody Aluno aluno){
         return ResponseEntity.ok(alunoService.salvar(aluno));
     }
 
@@ -51,7 +53,7 @@ public class AlunoResource {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Aluno> alterar(@PathVariable Integer id, @RequestBody Aluno aluno){
+    public ResponseEntity<AlunoDTO> alterar(@PathVariable Integer id, @RequestBody Aluno aluno){
         try {
             return ResponseEntity.ok(alunoService.alterar(id, aluno));
         }catch (EntidadeNaoEncontradaException e){

@@ -8,11 +8,12 @@ import lombok.EqualsAndHashCode;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.io.Serializable;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Entity
-public class Professor {
+public class Professor implements Serializable {
 
     @EqualsAndHashCode.Include
     @Id

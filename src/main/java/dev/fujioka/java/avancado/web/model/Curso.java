@@ -7,10 +7,12 @@ import lombok.EqualsAndHashCode;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.io.Serializable;
+
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Entity
-public class Curso {
+public class Curso implements Serializable {
 
     @EqualsAndHashCode.Include
     @Id

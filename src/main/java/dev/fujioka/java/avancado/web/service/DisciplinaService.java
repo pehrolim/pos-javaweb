@@ -1,9 +1,11 @@
 package dev.fujioka.java.avancado.web.service;
 
+import dev.fujioka.java.avancado.web.dto.DisciplinaDTO;
 import dev.fujioka.java.avancado.web.exception.EntidadeNaoEncontradaException;
 import dev.fujioka.java.avancado.web.model.Disciplina;
 import dev.fujioka.java.avancado.web.repository.DisciplinaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,9 +17,19 @@ public class DisciplinaService {
     @Autowired
     DisciplinaRepository disciplinaRepository;
 
+    @Autowired
+    private JmsTemplate jmsTemplate;
+
     @Transactional
-    public Disciplina salvar(Disciplina disciplina){
-        return disciplinaRepository.save(disciplina);
+    public DisciplinaDTO salvar(Disciplina disciplina){
+        disciplinaRepository.save(disciplina);
+        jmsTemplate.convertAndSend("disciplina_queue", disciplina);
+        return DisciplinaDTO.builder().nome(disciplina.getNome())
+                .professor(disciplina.getProfessor())
+                .statusDisciplina(disciplina.getStatusDisciplina())
+                .cargaHoraria(disciplina.getCargaHoraria())
+                .observacao(disciplina.getObservacao())
+                .build();
     }
 
     public List<Disciplina> listarDisciplinas(){
@@ -40,7 +52,7 @@ public class DisciplinaService {
     }
 
     @Transactional
-    public Disciplina alterar(Integer id, Disciplina novaDisciplina){
+    public DisciplinaDTO alterar(Integer id, Disciplina novaDisciplina){
         Disciplina disciplina = consultarPorId(id);
         this.atualizaDisciplina(disciplina, novaDisciplina);
         return this.salvar(disciplina);

@@ -1,9 +1,11 @@
 package dev.fujioka.java.avancado.web.service;
 
+import dev.fujioka.java.avancado.web.dto.AlunoDTO;
 import dev.fujioka.java.avancado.web.exception.EntidadeNaoEncontradaException;
 import dev.fujioka.java.avancado.web.model.Aluno;
 import dev.fujioka.java.avancado.web.repository.AlunoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,9 +17,20 @@ public class AlunoService {
     @Autowired
     private AlunoRepository alunoRepository;
 
+    @Autowired
+    private JmsTemplate jmsTemplate;
+
     @Transactional
-    public Aluno salvar(Aluno aluno){
-        return alunoRepository.save(aluno);
+    public AlunoDTO salvar(Aluno aluno){
+
+        aluno = alunoRepository.save(aluno);
+
+        jmsTemplate.convertAndSend("matricula_aluno_queue", aluno);
+
+        return AlunoDTO.builder().nome(aluno.getNome())
+                .matriucla(aluno.getMatricula())
+                .curso(aluno.getCurso())
+                .build();
     }
 
 
@@ -42,7 +55,7 @@ public class AlunoService {
     }
 
     @Transactional
-    public Aluno alterar(Integer id, Aluno novoAluno){
+    public AlunoDTO alterar(Integer id, Aluno novoAluno){
         Aluno aluno = consultarPorId(id);
         this.atualizaAluno(aluno, novoAluno);
         return this.salvar(aluno);

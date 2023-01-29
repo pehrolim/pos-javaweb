@@ -1,10 +1,12 @@
 package dev.fujioka.java.avancado.web.service;
 
 
+import dev.fujioka.java.avancado.web.dto.CursoDTO;
 import dev.fujioka.java.avancado.web.exception.EntidadeNaoEncontradaException;
 import dev.fujioka.java.avancado.web.model.Curso;
 import dev.fujioka.java.avancado.web.repository.CursoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,9 +18,14 @@ public class CursoService {
     @Autowired
     CursoRepository cursoRepository;
 
+    @Autowired
+    private JmsTemplate jmsTemplate;
+
     @Transactional
-    public Curso salvar(Curso curso){
-        return cursoRepository.save(curso);
+    public CursoDTO salvar(Curso curso){
+        curso = cursoRepository.save(curso);
+        jmsTemplate.convertAndSend("curso_queue", curso);
+        return CursoDTO.builder().nome(curso.getNome()).descricao(curso.getDescricao()).build();
     }
 
     public List<Curso> listarCursos(){
@@ -43,7 +50,7 @@ public class CursoService {
     }
 
     @Transactional
-    public Curso alterar(Integer id, Curso novoCurso){
+    public CursoDTO alterar(Integer id, Curso novoCurso){
         Curso curso = consultarPorId(id);
         this.atualizaCurso(curso, novoCurso);
         return this.salvar(curso);
